@@ -1,27 +1,42 @@
 require 'require_farm'
-require 'benchmark'
 
 class Test
   def initialize
     @rules = TicTacToe
     @minimax_bot = AI::MinimaxBot.new
     @ant_bot = AI::AntColonyBot.new
+    @random_bot = AI::RandomBot.new
   end
 
-  def run(colors = nil)
-    @players = [@minimax_bot, @ant_bot]
-    @colors = colors || [:black, :white]
+  def test times, player1, player2
+    players = []
+    [player1, player2].each do |player|
+      case player
+      when :minimax then
+        players << @minimax_bot
+      when :ac then
+        players << @ant_bot
+      when :random then
+        players <<  @random_bot
+      end
+    end
+    colors = [:white, :black]
+    result = []
+    times.times do
+      result << run(colors, players)
+    end
+    [result.count(:white), result.count(:black), result.count(nil), result.size]
+  end
+
+  def run(colors =  [:black, :white], players = [@minimax_bot, @ant_bot] )
     rules = @rules.new
     until rules.final?
-      move = @players.first.select rules, @colors.first
+      move = players.first.select(rules, colors.first)
       rules.apply! move
-      @players.reverse!
-      @colors.reverse!
+      players.reverse!
+      colors.reverse!
     end
-    return 'draw' if rules.draw?
-    return 'minimax' if rules.winner == :white
-    return 'ant system' if rules.winner == :black
-    raise 'wtf?'
+    return rules.winner
   end
 
   def run_more(n=10, ant_system_color = :white)

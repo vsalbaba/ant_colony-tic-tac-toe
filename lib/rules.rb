@@ -31,7 +31,7 @@ class TicTacToe
   #   #moves      - provides a list of all possible moves for a position
   def moves
     if @@cache[hash] then
-      puts "moves from cache! (hash = #{hash})"
+     # puts "moves from cache! (hash = #{hash})"
       return @@cache[hash]
     end
     return [] if final?
