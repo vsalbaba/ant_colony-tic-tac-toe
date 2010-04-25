@@ -11,3 +11,5 @@ require 'ai/algorithm/plain'
 require 'ai/evaluator/ant_colony_database'
 require 'ai/ant_colony_bot'
 
+require 'ai/random_bot'
+
