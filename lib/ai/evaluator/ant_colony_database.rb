@@ -4,8 +4,7 @@ module AI
       require 'rubygems'
       require 'sqlite3'
 
-      def evaluate(position, player)
-        database_name = File.join(File.expand_path(File.dirname(__FILE__)) , 'database.sqlite3')
+      def evaluate(position, player, database_name = File.join(File.expand_path(File.dirname(__FILE__)) , 'evaluator', 'database.sqlite3'))
         @db ||= SQLite3::Database.new database_name
         case player
         when :white

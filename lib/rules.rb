@@ -45,7 +45,7 @@ class TicTacToe
     end
 
     if @@cache[hash] then
-      puts "identical hash found! should not happen"
+      #puts "identical hash found! should not happen"
     end
     @@cache[hash] = moves
     moves
