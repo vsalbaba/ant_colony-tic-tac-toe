@@ -88,19 +88,10 @@ class Board
     p
   end
 
-  def inspect
-    "Board( @base = #{@base.inspect}, @height = #{@height.inspect}, @width = #{@width.inspect}, @cells = #{@cells.inspect}, @occupied = #{@occupied.inspect})"
-  end
-
   def hash
-    hash = @occupied.dup
-    hash[nil] = nil
-    hash.each do |key, value|
-      if value.respond_to?(:map!) then
-        value.map!(&:to_s).sort!
-      end
-    end
-    @hash ||= hash.to_s
+    @players.map do |player|
+      player.to_s + @occupied[player].to_s
+    end.to_s
   end
 
   def invalidate_hash
