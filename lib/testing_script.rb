@@ -1,12 +1,13 @@
 require 'require_farm'
 
 class Test
-  def initialize(db = File.join(File.expand_path(File.dirname(__FILE__)) , 'ai', 'evaluator', 'database.sqlite3'))
+  def initialize(db = File.join(File.expand_path(File.dirname(__FILE__)) , 'ai', 'evaluator', 'database.pstore'))
     @db = db
     @rules = TicTacToe
     @minimax_bot = AI::MinimaxBot.new
     @ant_bot = AI::AntColonyBot.new
     @random_bot = AI::RandomBot.new
+    @primitive_bot = AI::PrimitiveBot.new
   end
 
   def test times, player1, player2, args = {}
@@ -19,6 +20,8 @@ class Test
         players << @ant_bot
       when :random then
         players <<  @random_bot
+      when :primitive then
+        players << @primitive_bot
       end
     end
     colors = [:white, :black]
@@ -42,28 +45,6 @@ class Test
       colors.reverse!
     end
     return rules.winner
-  end
-
-  def run_more(n=10, ant_system_color = :white)
-    minimax = 0
-    draw = 0
-    ant_system = 0
-    colors = ant_system_color == :white ? [:black, :white] : [:white, :black]
-    n.times do
-      case self.run colors
-      when 'draw'
-        draw += 1
-      when 'minimax'
-        minimax += 1
-      when 'ant system'
-        ant_system += 1
-      end
-    end
-    puts "
-draw     - #{draw}
-minimax  - #{minimax}
-as       - #{ant_system}
-"
   end
 end
 
