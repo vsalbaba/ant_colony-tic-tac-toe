@@ -5,22 +5,42 @@ require File.join(File.expand_path(this_file_path) , 'move')
 class TicTacToe
   attr_reader :board, :players
   #   #initialize - creates the initial position
-  def initialize
+  def initialize(hash = '')
     @board = Board.square(9, {:coords => [
-      :a2, :b2, :c2,
-      :a1, :b1, :c1,
-      :a0, :b0, :c0
-  ]})
+          :a2, :b2, :c2,
+          :a1, :b1, :c1,
+          :a0, :b0, :c0
+        ]})
     @players = [:white, :black]
     TicTacToe.clear_cache!
+    unless hash.empty?
+      #      puts hash.inspect
+      white_stream, black_stream = hash.split(/black|white/)[1..-1]
+      i = 0
+      white = white_stream[i*2, 2]
+      until white.empty?
+        @board[white] = :white
+        @players << @players.shift
+        i += 1
+        white = white_stream[i*2, 2]
+      end
+      i = 0
+      black = black_stream[i*2, 2]
+      until black.empty?
+        @board[black] = :black
+        @players << @players.shift
+        i += 1
+        black = black_stream[i*2, 2]
+      end
+    end
   end
 
   def self.clear_cache!
     @@cache = {}
   end
 
-  def new
-    TicTacToe.new
+  def new(hash = '')
+    TicTacToe.new hash
   end
 
   #   #move?      - tests the validity of a move against a position
@@ -31,7 +51,7 @@ class TicTacToe
   #   #moves      - provides a list of all possible moves for a position
   def moves
     if @@cache[hash] then
-     # puts "moves from cache! (hash = #{hash})"
+      # puts "moves from cache! (hash = #{hash})"
       return @@cache[hash]
     end
     return [] if final?
@@ -65,15 +85,15 @@ class TicTacToe
   def final?
     return true if self.draw?
     [[:a0, :a1, :a2], #radky
-     [:b0, :b1, :b2],
-     [:c0, :c1, :c2],
+      [:b0, :b1, :b2],
+      [:c0, :c1, :c2],
 
-     [:a0, :b0, :c0], # sloupce
-     [:a1, :b1, :c1],
-     [:a2, :b2, :c2],
+      [:a0, :b0, :c0], # sloupce
+      [:a1, :b1, :c1],
+      [:a2, :b2, :c2],
 
-     [:a0, :b1, :c2], # diagonaly
-     [:a2, :b1, :c0]].any? do |winning_position|
+      [:a0, :b1, :c2], # diagonaly
+      [:a2, :b1, :c0]].any? do |winning_position|
       if (player = board[winning_position.first]) != nil then
         winning_position.all? do |field|
           board[field] == player
