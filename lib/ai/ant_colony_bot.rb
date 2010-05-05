@@ -1,8 +1,8 @@
 module AI
   class AntColonyBot < Bot
-    include AI::Evaluator::AntColonyDatabase
+    include AI::Evaluator::AntColonyPStore
     include AI::Selector::Best
-    def select position, player, db = File.join(File.expand_path(File.dirname(__FILE__)) , 'database.sqlite3')
+    def select position, player, db = File.join(File.expand_path(File.dirname(__FILE__)) , 'database.pstore')
       scores_with_values = analyze(position, player, db)
       score, move = best( scores_with_values )
       changed
@@ -23,4 +23,3 @@ module AI
     end
   end
 end
-
