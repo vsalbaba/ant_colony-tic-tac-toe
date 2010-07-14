@@ -16,6 +16,7 @@ class TicTacToe
     unless hash.empty?
       #      puts hash.inspect
       white_stream, black_stream = hash.split(/black|white/)[1..-1]
+      return self if white_stream.nil?
       i = 0
       white = white_stream[i*2, 2]
       until white.empty?
@@ -25,6 +26,7 @@ class TicTacToe
         white = white_stream[i*2, 2]
       end
       i = 0
+      return self if black_stream.nil?
       black = black_stream[i*2, 2]
       until black.empty?
         @board[black] = :black
@@ -77,9 +79,17 @@ class TicTacToe
     if move?(move) then
       board[move.move] = move.by
 
-    @players << @players.shift
-    invalidate_hash
-    self
+      @players << @players.shift
+      invalidate_hash
+      self
+    else
+      raise "InvalidMove-#{move.inspect}"
+    end
+  end
+
+  #  apply        - apply a move to a position without sideeffects
+  def apply(move)
+    self.dup.apply! move
   end
 
   #   #final?     - tests whether or not the position is terminal
