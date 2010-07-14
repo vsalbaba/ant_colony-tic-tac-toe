@@ -74,7 +74,8 @@ class TicTacToe
   #   #apply!     - apply a move to a position, changing it into its successor
   #                 position
   def apply!(move)
-    board[move.move] = move.by
+    if move?(move) then
+      board[move.move] = move.by
 
     @players << @players.shift
     invalidate_hash

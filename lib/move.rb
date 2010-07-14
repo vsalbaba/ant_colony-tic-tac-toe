@@ -23,6 +23,10 @@ class Move
     move.join(" - ") + "\n"
   end
 
+  def ==(other_move)
+    move == other_move.move and take == other_move.take and by == other_move.by
+  end
+
   def apply_to( game )
     game.apply! self
   end
