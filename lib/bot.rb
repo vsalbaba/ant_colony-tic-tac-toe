@@ -2,9 +2,6 @@ class Bot < Player
   require 'observer'
   include Observable
 
-  def initialize
-  end
-
   def running?
     @running
   end
