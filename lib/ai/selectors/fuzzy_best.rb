@@ -6,6 +6,7 @@ module Selectors
      m = s.max
      fuzzy_bests = s.select { |score,move| (score - m.first).abs <= delta }
      m =  fuzzy_bests[rand(fuzzy_bests.length)]
-   end
+    end
+  end
 end
 

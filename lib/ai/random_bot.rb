@@ -8,6 +8,9 @@ module AI
       "RandomBot"
     end
 
+    def update *args
+    end
+
     def select_best_move( position, player )
       move = position.moves[rand(position.moves.length)]
       changed

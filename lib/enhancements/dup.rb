@@ -4,6 +4,12 @@ class Fixnum
   end
 end
 
+class Float
+  def dup
+    self
+  end
+end
+
 class NilClass
   def dup
     self
@@ -19,7 +25,7 @@ end
 class Hash
   def dup
     duplicate = Hash.new
-    each { |k, v| duplicate[k] = v.dup }
+    each { |k, v| duplicate[k] = v.dup}
     duplicate
   end
 end

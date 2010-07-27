@@ -6,6 +6,9 @@ class Bot < Player
     @running
   end
 
+  def update *args
+  end
+
   def select( position, player)
     raise "method select must be redefined in bot"
   end

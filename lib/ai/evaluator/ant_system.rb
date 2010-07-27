@@ -9,12 +9,23 @@ module AI
           load_state filename
           @ant_count = ant_count
           @alpha = 1
+          @beta = 2
           @coef = 1
           @evap_rate = 0.5
+          @gamma = 8.0
         end
 
         def load_state(filename)
           @state = PStore.new(filename)
+
+          @state.transaction do
+            @state[:trails] ||= {}
+            @state[:trails].default = 1.0
+          end
+          @state.transaction do
+            @state[:ants] ||= []
+          end
+
         end
 
         def reset
@@ -30,17 +41,25 @@ module AI
         end
 
         def learn(ant)
-          add_ant ant
-          ants = nil
-          @state.transaction do
-            ants = @state[:ants].size
+          if is_valuable?(ant) then
+            puts "learning! #{ant.inspect}"
+            add_ant ant
+            ants = nil
+            @state.transaction do
+              ants = @state[:ants].size
+            end
+            if ants >= ant_count then
+              puts "ant_count_reached!"
+              evaporate_trails
+              update_pheromones
+              initialize_ants
+            end
           end
-          if ants >= ant_count then
-            puts 'meh'
-            evaporate_trails
-            update_pheromones
-            initialize_ants
-          end
+        end
+
+        def is_valuable?(ant)
+          game = TicTacToe.new(ant.last)
+          game.final? and (game.winner == :white or game.draw?)
         end
 
         def add_ant(ant)
@@ -67,7 +86,14 @@ module AI
         end
 
         def compute_pheromone(ant)
-          1.0 / ant.size**@coef
+          case TicTacToe.new(ant.last).winner
+          when :white then
+            return 1.0
+          when nil then
+            return 0.5
+          else
+            return 0.0
+          end
         end
 
         # pair is in format [ant_trail, pheromone_value]
@@ -93,6 +119,16 @@ module AI
           #pick next step
           neigh = neighbours(ant.last, ant)
           path_probabilities = neigh.map{|target| p(ant.last, target, ant)}
+          #puts path_probabilities.zip(neigh), "--"
+          #inverse probabilities if player is :black
+          if TicTacToe.new(ant.last).turn == :black then
+            inversed_probabilities = path_probabilities.map{|p| (1 - p)**@gamma}
+            sum_of_inversed_probs = inversed_probabilities.inject{|sum, n| sum + n}
+            #now adjust them so sum of all is 1.0
+            adjusted_probabilities = inversed_probabilities.map{|p| p / sum_of_inversed_probs}
+            path_probabilities = adjusted_probabilities
+          end
+          #puts path_probabilities.zip(neigh)
           picked_number = rand
           next_step = catch(:done) do
             path_probabilities.each_with_index do |prob, index|
@@ -107,11 +143,27 @@ module AI
         def p(i, j, k)
           n = neighbours(i, k)
           if n.include?(j) then
+            this_move_value = 0.0
+            other_possible_moves_summed_value = 0.0
             @state.transaction do
-              @state[:trails][[i, j]]**@alpha / n.inject(0){|sum, n| sum + @state[:trails][[i, n]]**@alpha}
+              this_move_value = @state[:trails][[i, j]]
+              other_possible_moves_summed_value = n.inject(0){|sum, n| sum + (@state[:trails][[i, n]]**@alpha)*(heuristic_value(i, n)**@beta)}
             end
+            probability = (this_move_value**@alpha)*(heuristic_value(i, j)**@beta)/ (other_possible_moves_summed_value)
+            return probability
           else
             return 0.0
+          end
+        end
+
+        def heuristic_value(i, j)
+          case TicTacToe.new(j).winner
+          when :white then
+            10
+          when :black then
+            0.1
+          else
+            5
           end
         end
 
