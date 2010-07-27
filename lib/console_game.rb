@@ -4,7 +4,7 @@ require 'observer'
 class ConsoleGame
   attr_accessor :game, :players, :orig_players, :history
   include Observable
-  def initialize(players = [AI::AntSystemBot2.new, AI::AntSystemBot.new])
+  def initialize(players = [AI::AntSystemBot2, AI::AntSystemBot])
     @orig_players = players
     reset
   end
@@ -18,7 +18,7 @@ class ConsoleGame
 
   def reset
     @game = TicTacToe.new
-    @players = @orig_players
+    @players = @orig_players.map{|p| p.new}
     self.delete_observers
     @players.each do |p|
       p.delete_observers
